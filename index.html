@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <audio src="https://download.samplelib.com/mp3/sample-3s.mp3" controls></audio>
+
+    <button id="button-on">ON</button>
+    <button onclick="fetch('/off')">OFF</button>
+
+    <h2 id="time-element"></h2>
+
+    <h2 id="slider-value"></h2>
+    <input id="slider" type="range" min="0" max="20" value="0">
+
+    <script>
+        const slider_value = document.getElementById('slider-value')
+        const slider = document.getElementById('slider')
+        slider.oninput = () => {
+            slider_value.textContent = slider.value
+        }
+        slider.oninput()
+
+        let not_paused = true
+        const button_on = document.getElementById('button-on')
+        button_on.onclick = () => {
+            fetch(`/on?time=${slider.value}`)
+        }
+
+        const time_element = document.getElementById('time-element')
+
+        // Client: javascript
+        const source = new EventSource('/events')
+        source.onmessage = event => {
+            console.log(event.data)
+        }
+        source.addEventListener('time', event => {
+            time_element.textContent = `Time ${event.data}`
+        })
+        source.addEventListener('pause', () => {
+            time_element.textContent = 'Timer Paused'
+        })
+    </script>
+
+
+
+</body>
+
+</html>
